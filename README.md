@@ -1,103 +1,159 @@
 # Nismo
-🛰️ Home Network Analyzer
+🛰️Network Monitor v0.5
+A modern, real-time system to analyze, visualize, and secure your home network — built entirely with Python.
+Includes an AI-inspired packet sensor, interactive dashboard, and sleek neon UI.
 
-A lightweight, two-part system to monitor network traffic and discover devices on your local network in real time.
-Built for hackathons — combining a Python packet sniffer and a Dash web dashboard for visualization.
+🧠 Overview
 
-🚀 Overview
+This project is a two-part network monitoring suite:
+sensor_v0_4.py — The “brain” that captures packets, logs devices, profiles their network behavior, and generates security alerts.
+dashboard_v0_5.py — The visual “control center,” built with Plotly Dash + Cytoscape, showing real-time traffic, alerts, and device maps.
+style.css — A custom theme file that adds a futuristic cyber look to your dashboard.
+Together, they form a self-contained network sentinel — tracking, learning, and visualizing every connection in your home.
 
-This project consists of two main components:
-sensor_v0_3.py — A network sensor using scapy to capture packets, log network traffic, and detect connected devices (with manufacturer lookup via MAC address).
-dashboard_v0_2.py — A Dash-based web interface that visualizes live traffic and device information from the logs and database created by the sensor.
-Together, these scripts allow you to:
-Capture live IP/TCP/UDP traffic.
-Identify and track devices on your network.
-View real-time data through a browser dashboard.
+🧩 Architecture
+            ┌──────────────────────────┐
+            │     sensor_v0_4.py       │
+            │  • Captures packets      │
+            │  • Profiles behavior     │
+            │  • Generates alerts      │
+            │  • Stores in SQLite      │
+            └────────────┬─────────────┘
+                         │
+                         ▼
+             ┌─────────────────────┐
+             │     sentinel.db     │
+             │  • devices          │
+             │  • device_profiles  │
+             │  • alerts           │
+             └─────────┬───────────┘
+                       │
+                       ▼
+        ┌──────────────────────────────┐
+        │      dashboard_v0_5.py       │
+        │  • Live traffic log          │
+        │  • Security alert panel      │
+        │  • Interactive network map   │
+        │  • Device discovery table    │
+        └──────────────────────────────┘
+                       │
+                       ▼
+             ┌────────────────────────┐
+             │       style.css        │
+             │  • Cyberpunk theme     │
+             │  • Responsive design   │
+             └────────────────────────┘
 
-🧠 Architecture
-[ Sensor (sensor_v0_3.py) ]
-   ├─ Captures packets via Scapy
-   ├─ Logs traffic to CSV file (network_traffic.log)
-   ├─ Stores devices in SQLite (sentinel.db)
-   └─ Looks up vendor names via MAC address
-
-          ↓
-
-[ Dashboard (dashboard_v0_2.py) ]
-   ├─ Reads traffic from network_traffic.log
-   ├─ Reads device data from sentinel.db
-   ├─ Displays via Dash web UI
-   └─ Auto-refreshes every 5 seconds
-
-⚙️ Setup & Installation
+⚙️ Installation
 1. Clone the Repository
 git clone https://github.com/<your-username>/<your-repo-name>.git
 cd <your-repo-name>
 
 2. Install Dependencies
-You’ll need Python 3.8+ and the following packages:
-pip install dash pandas scapy mac-vendor-lookup
-(You may also need sqlite3, which is included by default with most Python installations.)
+pip install dash pandas scapy mac-vendor-lookup dash-cytoscape
 
-🧩 Usage
-Step 1: Run the Sensor
-Start capturing live network traffic.
-sudo python3 sensor_v0_3.py
+(Optional but recommended: Create a virtual environment before installing.)
 
-⚠️ Root privileges required for packet sniffing.
-This will:
-Create (or update) network_traffic.log
-Create a SQLite database sentinel.db
-Continuously log new packets and devices
+🚀 How to Run
+Step 1: Start the Network Sensor
+sudo python3 sensor_v0_4.py
+
+⚠️ Root/admin privileges are required for scapy to capture packets.
+
+This script will:
+
+Initialize sentinel.db (SQLite)
+Log all IP/TCP/UDP traffic to network_traffic.log
+Detect new devices and save manufacturer info
+Learn connection profiles
+Create alerts for insecure or new connections
 
 Step 2: Launch the Dashboard
 In a new terminal window:
-python3 dashboard_v0_2.py
-Then open your browser and go to:
-👉 http://127.0.0.1:8050 (similar link)
+python3 dashboard_v0_5.py
 
-🧠 Features
+Then open your browser at:
+👉 http://127.0.0.1:8050
+
+You’ll see four main tabs:
+
+Tab	Description
+🌐 Network Map	Visualizes live device connections using Dash Cytoscape
+🚨 Security Alerts	Shows CRITICAL and Medium alerts with timestamps and details
+💻 Discovered Devices	Lists all known devices with manufacturer info
+📊 Live Traffic	Displays most recent 50 packets in real time
+🛡️ Smart Security Features
 Feature	Description
-🌐 Live Traffic Monitor	Real-time table of captured IP/TCP/UDP packets
-💻 Device Discovery	Lists all devices seen on your subnet with manufacturer info
-🗃️ SQLite Storage	Devices persist between runs
-🧩 Vendor Lookup	Identifies hardware manufacturers using MAC addresses
-⚡ Auto-Refreshing Dashboard	Updates every 5 seconds
-🛠️ Configuration
+🔍 Device Discovery	Detects all devices on your subnet and identifies manufacturers
+⚠️ Insecure Protocol Detection	Flags use of FTP, Telnet, and HTTP as insecure
+🧠 Behavioral Profiling	Learns normal device communication patterns
+🧩 Anomaly Alerts	Generates alerts for never-before-seen connections
+💾 Persistent Logging	Saves all traffic, alerts, and devices to SQLite
+🌐 Live Network Map	Real-time visualization of your connections
+🎨 Cyber UI	Futuristic neon-blue theme powered by style.css
+🧰 Configuration
 
-Edit the following in sensor_v0_3.py to match your network:
-YOUR_SUBNET_PREFIX = "10.0.3." (ur ipv4 prefix)
+In sensor_v0_4.py, edit this line to match your network:
 
-Example:
-If your IP is 192.168.1.42, set:
 YOUR_SUBNET_PREFIX = "192.168.1."
 
-📂 Files
-File	Purpose
-sensor_v0_3.py	Network packet sniffer and device logger
-dashboard_v0_2.py	Dash dashboard for visualization
-network_traffic.log	Generated traffic log (CSV)
-sentinel.db	SQLite database storing device info
+You can also customize which ports are flagged as insecure:
+
+INSECURE_PORTS = {
+    21: "FTP (Insecure)",
+    23: "Telnet (Insecure)",
+    80: "HTTP (Unencrypted)"
+}
+
+🎨 Styling (style.css)
+
+The dashboard’s neon theme is defined in style.css.
+Key design features:
+Dark background with neon cyan and purple highlights
+Animated tab transitions
+Responsive layout for desktop & mobile
+Custom scrollbars and table glow effects
+To modify the look, simply tweak the color variables in the :root section.
+
+📂 Project Structure
+├── sensor_v0_4.py       # Packet sniffer, behavior profiler, and alert system
+├── dashboard_v0_5.py    # Dash dashboard with network map and alert center
+├── style.css            # Futuristic cyberpunk theme for dashboard
+├── sentinel.db          # SQLite database (auto-generated)
+├── network_traffic.log  # Real-time packet log (auto-generated)
+└── README.md            # You are here
+
 🧪 Example Output
 
-Terminal (sensor):
-🚀 Starting network sensor v0.3... (logging to network_traffic.log, DB at sentinel.db)
-Monitoring devices on subnet 10.0.3.*
-NEW DEVICE: Found new device with MAC 00:1A:2B:3C:4D:5E at 10.0.3.25
+Sensor Terminal:
+
+🚀 Starting network sensor v0.4... (The Brain)
+Monitoring devices on subnet 192.168.1.*
+NEW DEVICE: Found new device with MAC 00:1A:2B:3C:4D:5E at 192.168.1.15
+ALERT (CRITICAL): Insecure protocol detected: HTTP (Unencrypted) to 142.250.190.78
+ALERT (Medium): New connection detected: 192.168.1.15 -> 142.250.190.78:443 (TCP)
 
 
-Dashboard:
+Dashboard Tabs:
 
-Tab 1: Live Traffic (timestamps, protocol, source/destination)
-Tab 2: Discovered Devices (MAC, manufacturer, first seen, last seen)
-🧰 Tech Stack
-Python 3
-Dash — Interactive dashboard UI
-Scapy — Network packet sniffing
-SQLite3 — Lightweight local database
-Mac Vendor Lookup — Hardware manufacturer identification
+🌐 Network Map: Interactive graph with internal/external nodes
+🚨 Alerts: Color-coded by severity (red = CRITICAL, yellow = Medium)
+💻 Devices: Sorted by “Last Seen”
+📊 Live Traffic: Real-time packet table (auto-refresh every 5 seconds)
 
+🧠 Tech Stack
+Component	Technology
+Network Sniffer	Scapy
+Web Dashboard	Plotly Dash
+Graph Visualization	Dash Cytoscape
+
+Database	SQLite3
+Manufacturer Lookup	mac-vendor-lookup
+
+Styling	Custom CSS (neon cyberpunk theme)
 ⚠️ Disclaimer
-This tool is intended only for monitoring your own network.
-Do not use it on networks you don’t own or administer — packet capture without consent may violate local laws.
+
+This tool is for educational and personal network monitoring only.
+Do not use it on networks you do not own or administer.
+Unauthorized packet capture may be illegal in your jurisdiction.
 Team Nismo

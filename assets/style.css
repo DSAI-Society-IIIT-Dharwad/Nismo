@@ -1,0 +1,203 @@
+:root{
+    --bg:#050507;
+    --panel:#0f1113;
+    --panel-light:#1a1d21;
+    --muted:#9aa2a8;
+    --neon-cyan:#00AFFF;
+    --neon-green:#39FF14;
+    --accent-purple:#B24BF3;
+    --text-primary:#e6eef3;
+    --text-secondary:#b0b8c0;
+}
+
+body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', 'Consolas', monospace;
+    padding:20px 30px;
+}
+
+.app-title{
+    color: var(--neon-cyan);
+    font-size:32px;
+    font-weight:700;
+    margin:0 0 25px 0;
+    letter-spacing:2px;
+    border-left:5px solid var(--neon-cyan);
+    padding-left:18px;
+    text-shadow: 0 0 20px rgba(0,175,255,0.4);
+    background: linear-gradient(90deg, rgba(0,175,255,0.1) 0%, transparent 100%);
+    padding-top:15px;
+    padding-bottom:15px;
+    border-radius:0 8px 8px 0;
+}
+
+/* Tab Container Styling */
+.main-tabs {
+    margin-bottom:20px;
+    border-bottom:2px solid rgba(0,175,255,0.2);
+    padding-bottom:0;
+}
+
+/* Individual Tab Items */
+.main-tabs .tab-item {
+    background: var(--panel);
+    color: var(--text-secondary);
+    border:1px solid rgba(0,175,255,0.15);
+    padding:12px 24px;
+    margin-right:8px;
+    margin-bottom:-2px;
+    border-bottom:none;
+    border-radius:8px 8px 0 0;
+    display:inline-flex;
+    align-items:center;
+    transition:all 250ms ease;
+    text-transform:uppercase;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:1.5px;
+    cursor:pointer;
+    position:relative;
+}
+
+.main-tabs .tab-item:hover{ 
+    color:var(--neon-cyan);
+    background: var(--panel-light);
+    border-color: rgba(0,175,255,0.3);
+    transform: translateY(-2px);
+}
+
+/* Selected Tab Styling */
+.main-tabs .tab-item--selected,
+.main-tabs .tab-item[aria-selected="true"]{
+    background: linear-gradient(180deg, rgba(0,175,255,0.25) 0%, rgba(0,175,255,0.1) 100%);
+    color: var(--neon-cyan);
+    font-weight:700;
+    box-shadow: 0 4px 15px rgba(0,175,255,0.3), 
+                inset 0 1px 0 rgba(255,255,255,0.1);
+    border-color: rgba(0,175,255,0.4);
+    border-bottom:2px solid var(--neon-cyan);
+}
+
+/* Section Title Styling */
+.section-title{
+    color:var(--neon-cyan);
+    font-size:20px;
+    font-weight:600;
+    margin:10px 0 18px 0;
+    border-bottom:2px solid rgba(0,175,255,0.2);
+    padding-bottom:10px;
+    text-shadow: 0 0 10px rgba(0,175,255,0.3);
+}
+
+/* Content Area */
+#tabs-content {
+    background: var(--panel);
+    padding:25px;
+    border-radius:0 8px 8px 8px;
+    border:1px solid rgba(0,175,255,0.15);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Headings inside tabs */
+#tabs-content h3 {
+    color: var(--neon-cyan);
+    font-size:22px;
+    font-weight:600;
+    margin:0 0 20px 0;
+    padding-bottom:12px;
+    border-bottom:2px solid rgba(0,175,255,0.2);
+    text-shadow: 0 0 10px rgba(0,175,255,0.3);
+}
+
+/* Network Map Styling */
+#network-map{
+    background: #0b0b0c;
+    border-radius:8px;
+    border:2px solid rgba(0,175,255,0.3);
+    box-shadow: 0 0 20px rgba(0,175,255,0.2);
+}
+
+/* Table Container */
+.dash-table-container{
+    background: rgba(15,17,19,0.6);
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid rgba(0,175,255,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Table Header */
+.dash-header-row{
+    background: linear-gradient(180deg, var(--neon-cyan) 0%, #0088cc 100%);
+    color: #000;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:13px;
+}
+
+/* Table Cells */
+.dash-cell{
+    background: transparent;
+    color: var(--text-primary);
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    font-family: 'Consolas', monospace;
+}
+
+/* Table Row Hover Effect */
+.dash-table-container tr:hover .dash-cell{
+    background: rgba(0,175,255,0.08);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--panel);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0,175,255,0.4);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,175,255,0.6);
+}
+
+/* Add some animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#tabs-content > div {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+    
+    .app-title {
+        font-size: 24px;
+    }
+    
+    .main-tabs .tab-item {
+        font-size: 11px;
+        padding: 10px 16px;
+    }
+}

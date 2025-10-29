@@ -1,133 +1,69 @@
-#Team Nismo
-Network Monitor v0.7
-A real-time network monitoring system that captures, analyzes, and visualizes local network activity — all in a lightweight, Python-based interface.
-This version introduces anti-spam alert cooldowns (sensor v0.6) and a modern Dash dashboard with live data visualization (dashboard v0.7).
+# **Network Traffic Analyzer for Home Security**
 
-🧠 Overview
-The system consists of two main components:
-sensor_v0_6.py — A packet sniffer and behavioral analyzer using Scapy.
-Captures IP/TCP/UDP traffic
-Detects insecure or suspicious connections
-Generates alerts with cooldown logic
-Logs traffic and device activity to SQLite
-dashboard_v0_7.py — An interactive web dashboard built with Plotly Dash and Cytoscape.
-Displays live network traffic
-Shows real-time alerts
-Maps device communication visually
-Lists discovered devices with manufacturers
+## **Overview**
 
-⚙️ Installation
-1. Clone the Repository
-git clone https://github.com/DSAI-Society-IIIT-Dharwad/Nismo.git
-cd Nismo
+This project is a home network security monitoring system designed to detect suspicious activities in real-time. It analyzes network traffic, identifies connected devices, flags potential vulnerabilities or compromises, and visualizes communication patterns on an interactive web dashboard. The goal is to provide homeowners with insights into their network's behavior and alert them to potential threats.
 
-2. Install Dependencies
-pip install dash pandas scapy mac-vendor-lookup dash-cytoscape
+## **Core Features**
 
-🚀 Usage
-Step 1 — Start the Network Sensor
-Run with administrator/root privileges:
-sudo python3 sensor_v0_6.py
+This system integrates several layers of analysis to provide comprehensive monitoring:
 
-This script will:
-Initialize or update sentinel.db
-Begin capturing all IP/TCP/UDP packets
-Detect devices by MAC address and manufacturer
-Generate alerts for:
-Insecure protocols (FTP, Telnet, MQTT, etc.)
-Suspicious ports (RDP, SSH, SMB, ADB, etc.)
-New/unseen device connections
-Save live packet logs to network_traffic.log
-You’ll see output similar to:
+1. **Real-time Packet Capture:**  
+   * **Explanation:** Uses the scapy library to capture network packets directly from specified network interfaces (e.g., main Wi-Fi, hotspot).  
+   * **Need:** This is the fundamental data source. Without capturing packets, no analysis is possible.
+2. **Device Fingerprinting (MAC/OUI & DHCP):**  
+   * **Explanation:** Identifies devices on the network by their unique MAC address. It looks up the manufacturer using the OUI (first half of the MAC) and captures the device's self-assigned hostname (e.g., "Sams-iPhone", "LivingRoom-TV") from DHCP requests.  
+   * **Need:** Knowing *what* devices are on the network provides crucial context for alerts. A suspicious connection from a known computer is different from the same connection coming from a smart plug.  
+3. **Insecure Protocol Detection (CRITICAL Alerts):**  
+   * **Explanation:** Actively monitors for traffic using inherently insecure protocols like Telnet, FTP, rlogin, rsh, and unencrypted MQTT.  z
+   * **Need:** Usage of these protocols, especially by IoT devices, indicates a significant vulnerability that could be easily exploited. This directly addresses the "flag insecure IoT devices" objective.  
+4. **Suspicious Port Detection (HIGH Alerts):**  
+   * **Explanation:** Flags outbound connections to ports commonly associated with malicious activity or services that shouldn't typically originate from a home device (e.g., SSH, RDP, IRC, common malware backdoor ports).  
+   * **Need:** This helps detect potentially compromised devices that might be trying to connect to botnet command-and-control servers, attempting to spread laterally, or being remotely accessed.  
+5. **Connection Baselining (NORMAL Alerts):**  
+   * **Explanation:** Creates a profile for each known device, recording every unique connection (Destination IP \+ Port \+ Protocol) it makes. The *first* time a new, previously unseen connection is detected, a "NORMAL" alert is generated.  
+   * **Need:** While not inherently malicious, tracking new connections provides visibility into device behavior changes. It helps establish what's "normal" for each device over time.  
+6. **DNS Monitoring & Threat Intelligence (CRITICAL Alerts):**  
+   * **Explanation:** Captures DNS queries (UDP Port 53\) to see which domain names devices are trying to resolve. It checks these domains against a configurable blocklist of known malicious sites.  
+   * **Need:** Malware often uses domain names, not fixed IPs. Detecting attempts to contact known malicious domains is a highly effective way to catch compromised devices early, often before they establish a harmful connection.  
+7. **Interactive Dashboard (Plotly Dash):**  
+   * **Explanation:** A web-based user interface providing multiple views of the network data:  
+     * **Network Map:** Visualizes devices (using icons/hostnames) and their connections (color-coded by alert severity).  
+     * **Security Alerts:** Lists all generated alerts (CRITICAL, HIGH, NORMAL), color-coded and filterable by severity, with pop-up notifications for new high-priority alerts.  
+     * **Discovered Devices:** Shows all identified devices with their MAC, Hostname, Manufacturer, and activity timestamps.  
+     * **DNS Logs:** A live feed of all observed DNS queries.  
+     * **Live Traffic:** A raw log of captured network packets.  
+   * **Need:** Makes the complex network data accessible and understandable, allowing users to quickly assess the network's status and investigate alerts.
 
-🚀 Starting network sensor v0.6... (Anti-Spam Brain)
-Monitoring devices on subnet 10.0.3.*
-Alert cooldown set to 10 minutes.
-NEW DEVICE: Found new device with MAC 84:C2:E4:12:34:56 at 10.0.3.42
-ALERT (CRITICAL): Insecure protocol detected: Telnet (Insecure Remote Login) to 34.120.19.5
-ALERT (Info): New connection detected: 10.0.3.42 -> 8.8.8.8:443 (TCP)
+## **How it Works (Architecture)**
 
-Step 2 — Launch the Dashboard
-Open a new terminal and run:
-python3 dashboard_v0_7.py
+1. **Sensors (sensor\_\*.py):** Two Python scripts run using scapy to capture packets on different network interfaces (e.g., main Wi-Fi and a hotspot). They perform initial packet dissection (DHCP, DNS, TCP/UDP).  
+2. **Analysis & Database (sqlite3):** The sensors analyze packet details, compare against known patterns (ports, DNS blocklist, scan behavior), update device profiles, and log alerts and DNS queries into a central sentinel.db SQLite database.  
+3. **Dashboard (dashboard\_\*.py):** A Plotly Dash web application runs independently. It periodically queries the sentinel.db database and updates the tables and network map displayed in the user's web browser.
 
-Then open your browser and go to:
-👉 http://127.0.0.1:8050
+## **Setup & Running**
 
-🌐 Dashboard Overview
-Tab	Description
-🗺️ Network Map	Visual representation of recent device connections (30 latest)
-🚨 Security Alerts	Displays real-time alerts sorted by severity
-💻 Discovered Devices	Lists known devices with MAC address, manufacturer, and timestamps
-📊 Live Traffic	Shows the latest 50 packets captured in real time
-Map Visualization
+1. **Prerequisites:** Python 3, pip.
+2. **Clone the Repository:**
+   git clone \<https://github.com/DSAI-Society-IIIT-Dharwad/Nismo.git)\>  
+   cd Nismo
+3. **Install Dependencies:**  
+   pip install scapy mac-vendor-lookup dash pandas dash-cytoscape  
+   \# On Windows, install Npcap (with WinPcap compatibility)  
+   \# On Linux/macOS, ensure libpcap-dev (or equivalent) is installed
 
-Internal nodes = Local devices (your network)
-External nodes = Remote IPs (connections)
-Edges = Communication between internal and external nodes
+4. **Configure Sensors:** Edit both sensor\_main\_wifi.py and sensor\_hotspot.py:  
+   * Set YOUR\_SUBNET\_PREFIX correctly for each network they monitor.  
+   * Set the correct iface name in the sniff() command at the bottom of each file.  
+5. **Run:**  
+   * Open **Terminal 1 (Admin):** python sensor\_main\_wifi.py  
+   * Open **Terminal 2 (Admin):** python sensor\_hotspot.py  
+   * Open **Terminal 3 (Normal):** python dashboard.py (use your latest dashboard file)  
+6. **Access Dashboard:** Open http://127.0.0.1:8050 in your web browser.
 
-🛡️ Smart Features
-Feature	Description
-🔍 Device Discovery	Automatically identifies new devices by MAC vendor
-⚠️ Port Intelligence	Flags insecure and suspicious network ports
-🧠 Behavior Profiling	Learns normal communication patterns for each device
-🔕 Alert Cooldowns	Prevents spammy alerts by enforcing per-event cooldowns
-📡 Real-time Updates	Dashboard auto-refreshes every 5 seconds
-🌐 Interactive Network Map	See device relationships with Dash Cytoscape
-💾 Persistent Storage	SQLite + CSV for full network history
-🧰 Configuration
+## **Future Improvements**
 
-Edit these variables in sensor_v0_6.py to match your network setup:
-
-YOUR_SUBNET_PREFIX = "192.168.1."
-ALERT_COOLDOWN_MINUTES = 10
-
-The subnet prefix ensures alerts and discovery only apply to your own devices.
-The cooldown (in minutes) controls how often the same alert can repeat.
-
-📂 Project Structure
-├── sensor_v0_6.py         # Network sniffer and analyzer
-├── dashboard_v0_7.py      # Dash-based visualization dashboard
-├── assets/
-│   └── style.css          # Neon UI theme (optional custom styles)
-├── sentinel.db            # Auto-generated SQLite database
-├── network_traffic.log    # Auto-generated packet log
-└── README.md              # You are here
-
-🧪 Example Outputs
-Sensor Console
-🚀 Starting network sensor v0.6... (Anti-Spam Brain)
-Monitoring devices on subnet 10.0.3.*
-Alert cooldown set to 10 minutes.
-NEW DEVICE: Found new device with MAC 44:1A:2B:3C:4D:5E at 10.0.3.22
-ALERT (HIGH): Suspicious outbound port: RDP (Attempted Remote Desktop) to 54.71.82.113
-ALERT (Info): New connection detected: 10.0.3.22 -> 142.250.190.78:443 (TCP)
-
-Dashboard Interface
-Security Alerts: CRITICAL (red), HIGH (orange), Info (blue)
-Network Map: Displays connections visually
-Live Traffic: Scrollable table of recent packets
-Devices: Lists all devices by MAC and manufacturer
-
-🎨 Dashboard Styling
-The dashboard uses a neon cyber theme (defined in /assets/style.css):
-Dark background with cyan and teal accents
-Glowing headers and section highlights
-Smooth tab transitions
-Responsive for both desktop and laptop displays
-
-🧠 Tech Stack
-Component	Technology
-Packet Capture	Scapy
-Dashboard	Plotly Dash
-Graph Visualization	Dash Cytoscape
-Database	SQLite3
-Manufacturer Lookup	mac-vendor-lookup
-
-Styling	Custom CSS in /assets/style.css
-⚠️ Disclaimer
-
-This tool is for educational and personal network monitoring only.
-Do not use it to inspect or capture traffic on networks you don’t own or administer.
-Unauthorized monitoring may be illegal in your jurisdiction.
-#Team Nismo
+* **HTTP User-Agent Fingerprinting:** Extract User-Agent strings from HTTP traffic to identify specific applications or device models.  
+* **Traffic Volume Baselining:** Monitor the *amount* of data transferred per connection to detect anomalies like data exfiltration or DDoS participation.  
+* **Encrypted Traffic Analysis (Advanced):** Analyze patterns in encrypted traffic (TLS handshake details, connection timing) for potential threats (requires more advanced techniques).  
+* **Configuration File:** Move settings like subnet, cooldowns, and blocklists into a separate config file instead of hardcoding.

@@ -60,6 +60,21 @@ This system integrates several layers of analysis to provide comprehensive monit
    * Open **Terminal 2 (Admin):** python sensor\_hotspot.py  
    * Open **Terminal 3 (Normal):** python dashboard.py (use your latest dashboard file)  
 6. **Access Dashboard:** Open http://127.0.0.1:8050 in your web browser.
+7. **Preview Of the Dashboard**
+   
+![Network graph](https://github.com/DSAI-Society-IIIT-Dharwad/Nismo/blob/main/images/Screenshot%202025-10-29%20103907.png)
+
+![Security alerts](https://github.com/DSAI-Society-IIIT-Dharwad/Nismo/blob/main/images/Screenshot%202025-10-29%20103949.png)
+
+![Security alerts](https://github.com/DSAI-Society-IIIT-Dharwad/Nismo/blob/main/images/Screenshot%202025-10-29%20103958.png)
+
+![Security alerts](https://github.com/DSAI-Society-IIIT-Dharwad/Nismo/blob/main/images/Screenshot%202025-10-29%20104018.png)
+
+![Discovered devices](https://github.com/DSAI-Society-IIIT-Dharwad/Nismo/blob/main/images/Screenshot%202025-10-29%20104108.png)
+
+![DNS logs](https://github.com/DSAI-Society-IIIT-Dharwad/Nismo/blob/main/images/Screenshot%202025-10-29%20104117.png)
+
+![Live traffic](https://github.com/DSAI-Society-IIIT-Dharwad/Nismo/blob/main/images/Screenshot%202025-10-29%20104126.png)
 
 ## **Future Improvements**
 

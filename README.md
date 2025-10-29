@@ -1,159 +1,133 @@
-# Nismo
-🛰️Network Monitor v0.5
-A modern, real-time system to analyze, visualize, and secure your home network — built entirely with Python.
-Includes an AI-inspired packet sensor, interactive dashboard, and sleek neon UI.
+#Team Nismo
+Network Monitor v0.7
+A real-time network monitoring system that captures, analyzes, and visualizes local network activity — all in a lightweight, Python-based interface.
+This version introduces anti-spam alert cooldowns (sensor v0.6) and a modern Dash dashboard with live data visualization (dashboard v0.7).
 
 🧠 Overview
-
-This project is a two-part network monitoring suite:
-sensor_v0_4.py — The “brain” that captures packets, logs devices, profiles their network behavior, and generates security alerts.
-dashboard_v0_5.py — The visual “control center,” built with Plotly Dash + Cytoscape, showing real-time traffic, alerts, and device maps.
-style.css — A custom theme file that adds a futuristic cyber look to your dashboard.
-Together, they form a self-contained network sentinel — tracking, learning, and visualizing every connection in your home.
-
-🧩 Architecture
-            ┌──────────────────────────┐
-            │     sensor_v0_4.py       │
-            │  • Captures packets      │
-            │  • Profiles behavior     │
-            │  • Generates alerts      │
-            │  • Stores in SQLite      │
-            └────────────┬─────────────┘
-                         │
-                         ▼
-             ┌─────────────────────┐
-             │     sentinel.db     │
-             │  • devices          │
-             │  • device_profiles  │
-             │  • alerts           │
-             └─────────┬───────────┘
-                       │
-                       ▼
-        ┌──────────────────────────────┐
-        │      dashboard_v0_5.py       │
-        │  • Live traffic log          │
-        │  • Security alert panel      │
-        │  • Interactive network map   │
-        │  • Device discovery table    │
-        └──────────────────────────────┘
-                       │
-                       ▼
-             ┌────────────────────────┐
-             │       style.css        │
-             │  • Cyberpunk theme     │
-             │  • Responsive design   │
-             └────────────────────────┘
+The system consists of two main components:
+sensor_v0_6.py — A packet sniffer and behavioral analyzer using Scapy.
+Captures IP/TCP/UDP traffic
+Detects insecure or suspicious connections
+Generates alerts with cooldown logic
+Logs traffic and device activity to SQLite
+dashboard_v0_7.py — An interactive web dashboard built with Plotly Dash and Cytoscape.
+Displays live network traffic
+Shows real-time alerts
+Maps device communication visually
+Lists discovered devices with manufacturers
 
 ⚙️ Installation
 1. Clone the Repository
-git clone https://github.com/<your-username>/<your-repo-name>.git
-cd <your-repo-name>
+git clone https://github.com/DSAI-Society-IIIT-Dharwad/Nismo.git
+cd Nismo
 
 2. Install Dependencies
 pip install dash pandas scapy mac-vendor-lookup dash-cytoscape
 
-(Optional but recommended: Create a virtual environment before installing.)
-
-🚀 How to Run
-Step 1: Start the Network Sensor
-sudo python3 sensor_v0_4.py
-
-⚠️ Root/admin privileges are required for scapy to capture packets.
+🚀 Usage
+Step 1 — Start the Network Sensor
+Run with administrator/root privileges:
+sudo python3 sensor_v0_6.py
 
 This script will:
+Initialize or update sentinel.db
+Begin capturing all IP/TCP/UDP packets
+Detect devices by MAC address and manufacturer
+Generate alerts for:
+Insecure protocols (FTP, Telnet, MQTT, etc.)
+Suspicious ports (RDP, SSH, SMB, ADB, etc.)
+New/unseen device connections
+Save live packet logs to network_traffic.log
+You’ll see output similar to:
 
-Initialize sentinel.db (SQLite)
-Log all IP/TCP/UDP traffic to network_traffic.log
-Detect new devices and save manufacturer info
-Learn connection profiles
-Create alerts for insecure or new connections
+🚀 Starting network sensor v0.6... (Anti-Spam Brain)
+Monitoring devices on subnet 10.0.3.*
+Alert cooldown set to 10 minutes.
+NEW DEVICE: Found new device with MAC 84:C2:E4:12:34:56 at 10.0.3.42
+ALERT (CRITICAL): Insecure protocol detected: Telnet (Insecure Remote Login) to 34.120.19.5
+ALERT (Info): New connection detected: 10.0.3.42 -> 8.8.8.8:443 (TCP)
 
-Step 2: Launch the Dashboard
-In a new terminal window:
-python3 dashboard_v0_5.py
+Step 2 — Launch the Dashboard
+Open a new terminal and run:
+python3 dashboard_v0_7.py
 
-Then open your browser at:
+Then open your browser and go to:
 👉 http://127.0.0.1:8050
 
-You’ll see four main tabs:
-
+🌐 Dashboard Overview
 Tab	Description
-🌐 Network Map	Visualizes live device connections using Dash Cytoscape
-🚨 Security Alerts	Shows CRITICAL and Medium alerts with timestamps and details
-💻 Discovered Devices	Lists all known devices with manufacturer info
-📊 Live Traffic	Displays most recent 50 packets in real time
-🛡️ Smart Security Features
+🗺️ Network Map	Visual representation of recent device connections (30 latest)
+🚨 Security Alerts	Displays real-time alerts sorted by severity
+💻 Discovered Devices	Lists known devices with MAC address, manufacturer, and timestamps
+📊 Live Traffic	Shows the latest 50 packets captured in real time
+Map Visualization
+
+Internal nodes = Local devices (your network)
+External nodes = Remote IPs (connections)
+Edges = Communication between internal and external nodes
+
+🛡️ Smart Features
 Feature	Description
-🔍 Device Discovery	Detects all devices on your subnet and identifies manufacturers
-⚠️ Insecure Protocol Detection	Flags use of FTP, Telnet, and HTTP as insecure
-🧠 Behavioral Profiling	Learns normal device communication patterns
-🧩 Anomaly Alerts	Generates alerts for never-before-seen connections
-💾 Persistent Logging	Saves all traffic, alerts, and devices to SQLite
-🌐 Live Network Map	Real-time visualization of your connections
-🎨 Cyber UI	Futuristic neon-blue theme powered by style.css
+🔍 Device Discovery	Automatically identifies new devices by MAC vendor
+⚠️ Port Intelligence	Flags insecure and suspicious network ports
+🧠 Behavior Profiling	Learns normal communication patterns for each device
+🔕 Alert Cooldowns	Prevents spammy alerts by enforcing per-event cooldowns
+📡 Real-time Updates	Dashboard auto-refreshes every 5 seconds
+🌐 Interactive Network Map	See device relationships with Dash Cytoscape
+💾 Persistent Storage	SQLite + CSV for full network history
 🧰 Configuration
 
-In sensor_v0_4.py, edit this line to match your network:
+Edit these variables in sensor_v0_6.py to match your network setup:
 
 YOUR_SUBNET_PREFIX = "192.168.1."
+ALERT_COOLDOWN_MINUTES = 10
 
-You can also customize which ports are flagged as insecure:
-
-INSECURE_PORTS = {
-    21: "FTP (Insecure)",
-    23: "Telnet (Insecure)",
-    80: "HTTP (Unencrypted)"
-}
-
-🎨 Styling (style.css)
-
-The dashboard’s neon theme is defined in style.css.
-Key design features:
-Dark background with neon cyan and purple highlights
-Animated tab transitions
-Responsive layout for desktop & mobile
-Custom scrollbars and table glow effects
-To modify the look, simply tweak the color variables in the :root section.
+The subnet prefix ensures alerts and discovery only apply to your own devices.
+The cooldown (in minutes) controls how often the same alert can repeat.
 
 📂 Project Structure
-├── sensor_v0_4.py       # Packet sniffer, behavior profiler, and alert system
-├── dashboard_v0_5.py    # Dash dashboard with network map and alert center
-├── style.css            # Futuristic cyberpunk theme for dashboard
-├── sentinel.db          # SQLite database (auto-generated)
-├── network_traffic.log  # Real-time packet log (auto-generated)
-└── README.md            # You are here
+├── sensor_v0_6.py         # Network sniffer and analyzer
+├── dashboard_v0_7.py      # Dash-based visualization dashboard
+├── assets/
+│   └── style.css          # Neon UI theme (optional custom styles)
+├── sentinel.db            # Auto-generated SQLite database
+├── network_traffic.log    # Auto-generated packet log
+└── README.md              # You are here
 
-🧪 Example Output
+🧪 Example Outputs
+Sensor Console
+🚀 Starting network sensor v0.6... (Anti-Spam Brain)
+Monitoring devices on subnet 10.0.3.*
+Alert cooldown set to 10 minutes.
+NEW DEVICE: Found new device with MAC 44:1A:2B:3C:4D:5E at 10.0.3.22
+ALERT (HIGH): Suspicious outbound port: RDP (Attempted Remote Desktop) to 54.71.82.113
+ALERT (Info): New connection detected: 10.0.3.22 -> 142.250.190.78:443 (TCP)
 
-Sensor Terminal:
+Dashboard Interface
+Security Alerts: CRITICAL (red), HIGH (orange), Info (blue)
+Network Map: Displays connections visually
+Live Traffic: Scrollable table of recent packets
+Devices: Lists all devices by MAC and manufacturer
 
-🚀 Starting network sensor v0.4... (The Brain)
-Monitoring devices on subnet 192.168.1.*
-NEW DEVICE: Found new device with MAC 00:1A:2B:3C:4D:5E at 192.168.1.15
-ALERT (CRITICAL): Insecure protocol detected: HTTP (Unencrypted) to 142.250.190.78
-ALERT (Medium): New connection detected: 192.168.1.15 -> 142.250.190.78:443 (TCP)
-
-
-Dashboard Tabs:
-
-🌐 Network Map: Interactive graph with internal/external nodes
-🚨 Alerts: Color-coded by severity (red = CRITICAL, yellow = Medium)
-💻 Devices: Sorted by “Last Seen”
-📊 Live Traffic: Real-time packet table (auto-refresh every 5 seconds)
+🎨 Dashboard Styling
+The dashboard uses a neon cyber theme (defined in /assets/style.css):
+Dark background with cyan and teal accents
+Glowing headers and section highlights
+Smooth tab transitions
+Responsive for both desktop and laptop displays
 
 🧠 Tech Stack
 Component	Technology
-Network Sniffer	Scapy
-Web Dashboard	Plotly Dash
+Packet Capture	Scapy
+Dashboard	Plotly Dash
 Graph Visualization	Dash Cytoscape
-
 Database	SQLite3
 Manufacturer Lookup	mac-vendor-lookup
 
-Styling	Custom CSS (neon cyberpunk theme)
+Styling	Custom CSS in /assets/style.css
 ⚠️ Disclaimer
 
 This tool is for educational and personal network monitoring only.
-Do not use it on networks you do not own or administer.
-Unauthorized packet capture may be illegal in your jurisdiction.
-Team Nismo
+Do not use it to inspect or capture traffic on networks you don’t own or administer.
+Unauthorized monitoring may be illegal in your jurisdiction.
+#Team Nismo
